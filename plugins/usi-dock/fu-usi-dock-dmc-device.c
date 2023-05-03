@@ -6,6 +6,7 @@
 
 #include "config.h"
 
+#include "fu-usi-dock-common.h"
 #include "fu-usi-dock-dmc-device.h"
 
 struct _FuUsiDockDmcDevice {
@@ -35,6 +36,12 @@ fu_usi_dock_dmc_device_parent_notify_cb(FuDevice *device, GParamSpec *pspec, gpo
 		/* don't allow firmware updates on this */
 		fu_device_set_name(device, "Dock Management Controller Information");
 		fu_device_inhibit(device, "dummy", "Use the MCU to update the DMC device");
+
+		if (!fu_version_compare(fu_device_get_version(device),
+					"10.10",
+					FWUPD_VERSION_FORMAT_PAIR)) {
+			fu_device_add_private_flag(parent, FU_USI_DOCK_DEVICE_FLAG_SET_CHIP_TYPE);
+		}
 	}
 }
 

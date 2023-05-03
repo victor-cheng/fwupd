@@ -89,3 +89,6 @@ typedef struct {
 
 const gchar *
 fu_usi_dock_idx_to_string(guint8 val);
+
+#define FU_USI_DOCK_DEVICE_FLAG_VERFMT_HP     (1 << 0)
+#define FU_USI_DOCK_DEVICE_FLAG_SET_CHIP_TYPE (1 << 1)

@@ -21,8 +21,6 @@ G_DEFINE_TYPE(FuUsiDockMcuDevice, fu_usi_dock_mcu_device, FU_TYPE_HID_DEVICE)
 
 #define FU_USI_DOCK_MCU_DEVICE_TIMEOUT 5000 /* ms */
 
-#define FU_USI_DOCK_DEVICE_FLAG_VERFMT_HP (1 << 0)
-
 #define USI_DOCK_NON_IOT_INSTANCE_ID "USB\\VID_17EF&PID_30B4&CID_40B0"
 static gboolean
 fu_usi_dock_mcu_device_tx(FuUsiDockMcuDevice *self,
@@ -712,16 +710,22 @@ fu_usi_dock_mcu_device_write_firmware(FuDevice *device,
 }
 
 static gboolean
-fu_usi_dock_mcu_device_prepare(FuDevice *device,
-			       FuProgress *progress,
-			       FwupdInstallFlags flags,
-			       GError **error)
+fu_usi_dock_mcu_device_attach(FuDevice *device, FuProgress *progress, GError **error)
+{
+	fu_device_set_remove_delay(device, 900000);
+	fu_device_add_flag(device, FWUPD_DEVICE_FLAG_WAIT_FOR_REPLUG);
+
+	/* success */
+	return TRUE;
+}
+
+static gboolean
+fu_usi_dock_mcu_device_reload(FuDevice *device, GError **error)
 {
 	FuUsiDockMcuDevice *self = FU_USI_DOCK_MCU_DEVICE(device);
 	guint8 inbuf[] = {USBUID_ISP_DEVICE_CMD_SET_CHIP_TYPE, 1, 1};
 
-	if (fu_device_has_guid(device, USI_DOCK_NON_IOT_INSTANCE_ID) &&
-	    g_strcmp0(fu_device_get_version(device), "10.10") == 0) {
+	if (fu_device_has_private_flag(device, FU_USI_DOCK_DEVICE_FLAG_SET_CHIP_TYPE)) {
 		if (!fu_usi_dock_mcu_device_txrx(self,
 						 TAG_TAG2_CMD_MCU,
 						 inbuf,
@@ -730,19 +734,21 @@ fu_usi_dock_mcu_device_prepare(FuDevice *device,
 						 0x0,
 						 error))
 			return FALSE;
+		fu_device_remove_private_flag(device, FU_USI_DOCK_DEVICE_FLAG_SET_CHIP_TYPE);
 	}
-
-	return TRUE;
-}
-
-static gboolean
-fu_usi_dock_mcu_device_attach(FuDevice *device, FuProgress *progress, GError **error)
-{
-	fu_device_set_remove_delay(device, 900000);
-	fu_device_add_flag(device, FWUPD_DEVICE_FLAG_WAIT_FOR_REPLUG);
 
 	/* success */
 	return TRUE;
+}
+
+static void
+fu_usi_dock_mcu_device_incorporate(FuDevice *self, FuDevice *donor)
+{
+	/* FuUsbDevice */
+	FU_DEVICE_CLASS(fu_usi_dock_mcu_device_parent_class)->incorporate(self, donor);
+
+	if (fu_device_has_private_flag(donor, FU_USI_DOCK_DEVICE_FLAG_SET_CHIP_TYPE))
+		fu_device_add_private_flag(self, FU_USI_DOCK_DEVICE_FLAG_SET_CHIP_TYPE);
 }
 
 static void
@@ -771,6 +777,9 @@ fu_usi_dock_mcu_device_init(FuUsiDockMcuDevice *self)
 	fu_device_register_private_flag(FU_DEVICE(self),
 					FU_USI_DOCK_DEVICE_FLAG_VERFMT_HP,
 					"verfmt-hp");
+	fu_device_register_private_flag(FU_DEVICE(self),
+					FU_USI_DOCK_DEVICE_FLAG_SET_CHIP_TYPE,
+					"set-chip-type");
 	fu_hid_device_add_flag(FU_HID_DEVICE(self), FU_HID_DEVICE_FLAG_USE_INTERRUPT_TRANSFER);
 	fu_device_add_protocol(FU_DEVICE(self), "com.usi.dock");
 	fu_device_set_version_format(FU_DEVICE(self), FWUPD_VERSION_FORMAT_NUMBER);
@@ -788,5 +797,6 @@ fu_usi_dock_mcu_device_class_init(FuUsiDockMcuDeviceClass *klass)
 	klass_device->attach = fu_usi_dock_mcu_device_attach;
 	klass_device->setup = fu_usi_dock_mcu_device_setup;
 	klass_device->set_progress = fu_usi_dock_mcu_device_set_progress;
-	klass_device->prepare = fu_usi_dock_mcu_device_prepare;
+	klass_device->reload = fu_usi_dock_mcu_device_reload;
+	klass_device->incorporate = fu_usi_dock_mcu_device_incorporate;
 }
