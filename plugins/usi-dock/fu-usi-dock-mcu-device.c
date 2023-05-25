@@ -708,21 +708,7 @@ fu_usi_dock_mcu_device_prepare(FuDevice *device,
 			       FwupdInstallFlags flags,
 			       GError **error)
 {
-	FuUsiDockMcuDevice *self = FU_USI_DOCK_MCU_DEVICE(device);
-	guint8 inbuf[] = {USBUID_ISP_DEVICE_CMD_SET_CHIP_TYPE, 1, 1};
-
-	if (fu_device_has_guid(device, USI_DOCK_NON_IOT_INSTANCE_ID) &&
-	    g_strcmp0(fu_device_get_version(device), "10.10") == 0) {
-		if (!fu_usi_dock_mcu_device_txrx(self,
-						 FU_USI_DOCK_TAG2_CMD_MCU,
-						 inbuf,
-						 sizeof(inbuf),
-						 NULL,
-						 0x0,
-						 error))
-			return FALSE;
-	}
-
+	/* success */
 	return TRUE;
 }
 
