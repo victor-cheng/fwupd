@@ -718,7 +718,10 @@ fu_usi_dock_mcu_device_cleanup(FuDevice *device,
 	fwupd_request_add_flag(request, FWUPD_REQUEST_FLAG_ALLOW_GENERIC_MESSAGE);
 	fwupd_request_set_message(
 	    request,
-	    "The update will continue when the device USB cable has been re-inserted.");
+	    "Victor test "
+	    "continue. Otherwise, it will continue to update the next time the USB cable is "
+	    "unplugged. The new FW will take effect automatically when the dock cable is "
+	    "disconnected from and connected to the computer again.");
 	fu_device_emit_request(device, request);
 
 	/* success */
