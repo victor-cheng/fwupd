@@ -1,4 +1,6 @@
 [USB\VID_17EF&PID_30B4&CID_40B0]
+[USB\VID_17EF&PID_30B4&CID_40B0&PCB_0030]
+[USB\VID_17EF&PID_30B4&CID_40B0&PCB_0040]
 Plugin = usi_dock
 GType = FuUsiDockMcuDevice
 Name = ThinkPad Thunderbolt 4 Dock

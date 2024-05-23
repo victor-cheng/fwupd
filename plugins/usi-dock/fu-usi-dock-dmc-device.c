@@ -14,12 +14,15 @@ struct _FuUsiDockDmcDevice {
 
 G_DEFINE_TYPE(FuUsiDockDmcDevice, fu_usi_dock_dmc_device, FU_TYPE_USB_DEVICE)
 
+#define USI_SN_NUMBER_LENTH 14
+
 static void
 fu_usi_dock_dmc_device_parent_notify_cb(FuDevice *device, GParamSpec *pspec, gpointer user_data)
 {
 	FuDevice *parent = fu_device_get_parent(device);
 	if (parent != NULL) {
 		g_autoptr(GError) error = NULL;
+		g_autofree const gchar *serialnum = NULL;
 
 		/* slightly odd: the MCU device uses the DMC version number */
 		g_info("absorbing DMC version into MCU");
@@ -53,6 +56,28 @@ fu_usi_dock_dmc_device_parent_notify_cb(FuDevice *device, GParamSpec *pspec, gpo
 						      NULL)) {
 			g_warning("failed to build MCU DMC Instance ID: %s", error->message);
 			return;
+		}
+
+		/* allow matching PCB version */
+		serialnum = fu_device_get_serial(device);
+		if (strlen(serialnum) <= USI_SN_NUMBER_LENTH) {
+			if (serialnum[6] == 'Z' && serialnum[7] == 'D') {
+				/* PCB4.0 */
+				fu_device_add_instance_u16(parent, "PCB", 0x40);
+			} else {
+				fu_device_add_instance_u16(parent, "PCB", 0x30);
+			}
+			if (!fu_device_build_instance_id(parent,
+							 &error,
+							 "USB",
+							 "VID",
+							 "PID",
+							 "CID",
+							 "PCB",
+							 NULL)) {
+				g_warning("failed to build ID: %s", error->message);
+				return;
+			}
 		}
 
 		/* use a better device name */
