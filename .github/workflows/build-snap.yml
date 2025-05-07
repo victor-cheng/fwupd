@@ -25,13 +25,17 @@ jobs:
           sudo snap install core
           sudo snap install snapcraft --classic
 
+      - name: Link snapcraft.yaml
+        run: |
+          mkdir -p snap
+          ln -sf ../contrib/snap/snapcraft.yaml snap/snapcraft.yaml
+
       - name: Build snap
         run: |
-          cd snap
           snapcraft --destructive-mode
 
       - name: Upload snap artifact
         uses: actions/upload-artifact@v4
         with:
           name: fwupd-snap
-          path: snap/*.snap
+          path: ./*.snap
