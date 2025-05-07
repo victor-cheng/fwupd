@@ -1,4 +1,4 @@
-name: Build Snap Package
+name: Build Snap Package (LXD)
 
 on:
   workflow_dispatch:
@@ -11,31 +11,43 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.ref }}
 
-      - name: Install snapcraft
+      - name: Install LXD and Snapcraft
         run: |
           sudo apt update
-          sudo apt install -y snapd
+          sudo apt install -y snapd lxd
           sudo snap install core
           sudo snap install snapcraft --classic
+
+          sudo usermod -aG lxd $USER
+          sudo lxd init --auto || true
+          sleep 10  # Give LXD time to become ready
 
       - name: Link snapcraft.yaml
         run: |
           mkdir -p snap
           ln -sf ../contrib/snap/snapcraft.yaml snap/snapcraft.yaml
 
-      - name: Build snap
+      - name: Build Snap with LXD
         run: |
-          snapcraft --destructive-mode
+          snapcraft
 
-      - name: Upload snap artifact
+      - name: Rename Snap with Branch and Date
+        run: |
+          SNAP_FILE=$(ls *.snap | head -n 1)
+          DATE=$(date +'%Y%m%d')
+          BRANCH=${{ github.event.inputs.ref }}
+          NEW_NAME="fwupd-${BRANCH//\//-}-$DATE.snap"
+          mv "$SNAP_FILE" "$NEW_NAME"
+          echo "Renamed snap: $NEW_NAME"
+
+      - name: Upload Snap Artifact
         uses: actions/upload-artifact@v4
         with:
           name: fwupd-snap
-          path: ./*.snap
+          path: ./fwupd-*.snap
