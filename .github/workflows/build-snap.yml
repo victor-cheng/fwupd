@@ -1,7 +1,12 @@
 name: Build Snap Package
 
 on:
-  workflow_dispatch:  # 手動觸發
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch or tag to build'
+        required: false
+        default: 'main'
 
 jobs:
   build:
@@ -10,6 +15,8 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.ref }}
 
       - name: Install snapcraft and dependencies
         run: |
