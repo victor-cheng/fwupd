@@ -18,10 +18,12 @@ jobs:
         with:
           ref: ${{ github.event.inputs.ref }}
 
-      - name: Install snapcraft and dependencies
+      - name: Install snapcraft
         run: |
           sudo apt update
-          sudo apt install -y snapcraft
+          sudo apt install -y snapd
+          sudo snap install core
+          sudo snap install snapcraft --classic
 
       - name: Build snap
         run: |
