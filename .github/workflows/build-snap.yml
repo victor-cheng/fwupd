@@ -46,7 +46,7 @@ jobs:
 
       - name: Build Snap in destructive mode
         run: |
-          snapcraft --destructive-mode
+          sudo snapcraft --destructive-mode
 
       - name: Rename Snap with Branch and Date
         run: |
