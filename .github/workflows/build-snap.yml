@@ -31,6 +31,9 @@ jobs:
           sudo lxd init --auto || true
           sleep 10
 
+          # 切換至 lxd 群組
+          newgrp lxd || true
+
       - name: Link snapcraft.yaml
         run: |
           mkdir -p snap
