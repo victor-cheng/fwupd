@@ -21,3 +21,5 @@ fu_usi_dock_mcu_device_write_firmware_with_idx(FuUsiDockMcuDevice *self,
 					       FuProgress *progress,
 					       FwupdInstallFlags flags,
 					       GError **error);
+
+#define FU_USI_DOCK_DEVICE_FLAG_NO_REPLUG "no_replug"
