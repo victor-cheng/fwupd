@@ -17,17 +17,19 @@ jobs:
         with:
           ref: ${{ github.event.inputs.ref }}
 
-      - name: Install LXD and Snapcraft
+      - name: Install snapd and Snapcraft tools
         run: |
           sudo apt update
           sudo add-apt-repository universe
-          sudo apt install -y snapd lxd
+          sudo apt install -y snapd
           sudo snap install core
+          sudo snap install lxd
           sudo snap install snapcraft --classic
 
+          # 初始化 LXD
           sudo usermod -aG lxd $USER
           sudo lxd init --auto || true
-          sleep 10  # Wait for LXD to be fully ready
+          sleep 10
 
       - name: Link snapcraft.yaml
         run: |
