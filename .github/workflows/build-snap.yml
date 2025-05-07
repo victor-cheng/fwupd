@@ -1,0 +1,28 @@
+name: Build Snap Package
+
+on:
+  workflow_dispatch:  # 手動觸發
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install snapcraft and dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y snapcraft
+
+      - name: Build snap
+        run: |
+          cd snap
+          snapcraft --destructive-mode
+
+      - name: Upload snap artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: fwupd-snap
+          path: snap/*.snap
