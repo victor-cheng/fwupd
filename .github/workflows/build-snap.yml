@@ -31,9 +31,6 @@ jobs:
           sudo lxd init --auto || true
           sleep 10
 
-          # 切換至 lxd 群組
-          newgrp lxd || true
-
       - name: Link snapcraft.yaml
         run: |
           mkdir -p snap
@@ -41,7 +38,7 @@ jobs:
 
       - name: Build Snap with LXD
         run: |
-          snapcraft
+          sudo snapcraft
 
       - name: Rename Snap with Branch and Date
         run: |
