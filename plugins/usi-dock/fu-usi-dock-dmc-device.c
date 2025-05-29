@@ -80,19 +80,6 @@ fu_usi_dock_dmc_device_parent_notify_cb(FuDevice *device, GParamSpec *pspec, gpo
 			}
 		}
 
-		/* no replug matching running FW version */
-		if ((g_strcmp0(fu_device_get_name(device), "40B1") == 0 &&
-		     fu_version_compare(fu_device_get_version(device),
-					"10.10",
-					fu_device_get_version_format(device)) >= 0) ||
-		    (g_strcmp0(fu_device_get_name(device), "40B0") == 0 &&
-		     fu_version_compare(fu_device_get_version(device),
-					"10.18",
-					fu_device_get_version_format(device)) >= 0)) {
-			fu_device_add_private_flag(parent, FU_USI_DOCK_DEVICE_FLAG_NO_REPLUG);
-			g_info("set no_replug flag");
-		}
-
 		/* use a better device name */
 		fu_device_set_name(device, "Dock Management Controller Information");
 	}

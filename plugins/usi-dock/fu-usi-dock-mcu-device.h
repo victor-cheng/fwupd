@@ -23,3 +23,5 @@ fu_usi_dock_mcu_device_write_firmware_with_idx(FuUsiDockMcuDevice *self,
 					       GError **error);
 
 #define FU_USI_DOCK_DEVICE_FLAG_NO_REPLUG "no_replug"
+
+#define USI_DOCK_40B0_DEVID "USB\\VID_17EF&PID_30B4&CID_40B0"
