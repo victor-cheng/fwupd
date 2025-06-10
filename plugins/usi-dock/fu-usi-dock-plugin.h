@@ -9,3 +9,6 @@
 #include <fwupdplugin.h>
 
 G_DECLARE_FINAL_TYPE(FuUsiDockPlugin, fu_usi_dock_plugin, FU, USI_DOCK_PLUGIN, FuPlugin)
+
+gboolean
+fu_usi_dock_plugin_reset_usb(FuPlugin *plugin);

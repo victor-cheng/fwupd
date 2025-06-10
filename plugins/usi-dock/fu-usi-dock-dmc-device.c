@@ -7,6 +7,7 @@
 #include "config.h"
 
 #include "fu-usi-dock-dmc-device.h"
+#include "fu-usi-dock-mcu-device.h"
 
 struct _FuUsiDockDmcDevice {
 	FuUsbDevice parent_instance;
