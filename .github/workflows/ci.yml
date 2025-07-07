@@ -1,7 +1,8 @@
 name: Continuous Integration
 on:
   push:
-    branches: [ 1_9_X ]
+    branches: 
+        - '1.9.*'
 
 jobs:
   snap:
