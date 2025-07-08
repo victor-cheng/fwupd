@@ -7,6 +7,8 @@
 
 #include "config.h"
 
+#include <libusb.h>
+
 #include "fu-usi-dock-dmc-device.h"
 #include "fu-usi-dock-mcu-device.h"
 #include "fu-usi-dock-plugin.h"
@@ -51,4 +53,36 @@ fu_usi_dock_plugin_class_init(FuUsiDockPluginClass *klass)
 	FuPluginClass *plugin_class = FU_PLUGIN_CLASS(klass);
 	plugin_class->constructed = fu_usi_dock_plugin_constructed;
 	plugin_class->device_registered = fu_usi_dock_plugin_dmc_registered;
+}
+
+gboolean
+fu_usi_dock_plugin_reset_usb(guint16 vid, guint16 pid)
+{
+	libusb_device_handle *handle = NULL;
+	int ret;
+
+	if (libusb_init(NULL) < 0) {
+		g_info("libusb init failed");
+		return FALSE;
+	}
+
+	handle = libusb_open_device_with_vid_pid(NULL, vid, pid);
+	if (handle == NULL) {
+		g_info("Device %04x:%04x not found", vid, pid);
+		libusb_exit(NULL);
+		return FALSE;
+	}
+
+	ret = libusb_reset_device(handle);
+	if (ret != 0) {
+		g_info("Failed to reset %04x:%04x — %s", vid, pid, libusb_error_name(ret));
+		libusb_close(handle);
+		libusb_exit(NULL);
+		return FALSE;
+	}
+
+	g_info("Successfully reset device %04x:%04x", vid, pid);
+	libusb_close(handle);
+	libusb_exit(NULL);
+	return TRUE;
 }

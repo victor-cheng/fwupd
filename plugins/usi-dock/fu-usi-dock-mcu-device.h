@@ -21,3 +21,5 @@ fu_usi_dock_mcu_device_write_firmware_with_idx(FuUsiDockMcuDevice *self,
 					       FuProgress *progress,
 					       FwupdInstallFlags flags,
 					       GError **error);
+
+#define USI_DOCK_40B0_DEVID "USB\\VID_17EF&PID_30B4&CID_40B0"
