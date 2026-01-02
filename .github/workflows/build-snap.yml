@@ -1,0 +1,64 @@
+name: Build Snap Package (No LXD)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch or tag to build'
+        required: false
+        default: 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - name: Install snapd and snapcraft
+        run: |
+          sudo apt update
+          sudo apt install -y snapd
+          sudo snap install core
+          sudo snap install snapcraft --classic
+
+      - name: Install snapcraft build dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            bash-completion curl gcc gettext git gnu-efi hwdata \
+            libarchive-dev libcairo-dev libcbor-dev libcurl4-openssl-dev \
+            libglib2.0-dev libgnutls28-dev libgpgme11-dev libjcat-dev \
+            libjson-glib-dev liblzma-dev libmbim-glib-dev libmm-glib-dev \
+            libpango1.0-dev libpolkit-gobject-1-dev libprotobuf-c-dev \
+            libqmi-glib-dev libreadline-dev libsqlite3-dev libsystemd-dev \
+            libtss2-dev libusb-1.0-0-dev locales make meson modemmanager \
+            pkg-config protobuf-c-compiler python3-cairo python3-dbusmock \
+            python3-gi python3-jinja2 python3-pip shim-signed systemd \
+            umockdev uuid-dev
+
+      - name: Link snapcraft.yaml
+        run: |
+          mkdir -p snap
+          ln -sf ../contrib/snap/snapcraft.yaml snap/snapcraft.yaml
+
+      - name: Build Snap in destructive mode
+        run: |
+          sudo snapcraft --destructive-mode
+
+      - name: Rename Snap with Branch and Date
+        run: |
+          SNAP_FILE=$(ls *.snap | head -n 1)
+          DATE=$(date +'%Y%m%d')
+          BRANCH=${{ github.event.inputs.ref }}
+          NEW_NAME="fwupd-${BRANCH//\//-}-$DATE.snap"
+          mv "$SNAP_FILE" "$NEW_NAME"
+          echo "Renamed snap: $NEW_NAME"
+
+      - name: Upload Snap Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fwupd-snap
+          path: ./fwupd-*.snap
