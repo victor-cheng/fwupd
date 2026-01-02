@@ -52,12 +52,12 @@ fu_usi_dock_mcu_device_tx(FuUsiDockMcuDevice *self,
 		if (!fu_struct_usi_dock_mcu_cmd_req_set_buf(st, buf, bufsz, error))
 			return FALSE;
 	}
-
+#if 0
 	/* special cases */
 	if (st->buf->data[FU_STRUCT_USI_DOCK_MCU_CMD_REQ_OFFSET_BUF + 0] ==
 	    FU_USI_DOCK_MCU_CMD_FW_UPDATE)
 		st->buf->data[FU_STRUCT_USI_DOCK_MCU_CMD_REQ_OFFSET_BUF + 1] = 0xFF;
-
+#endif
 	return fu_hid_device_set_report(FU_HID_DEVICE(self),
 					USB_HID_REPORT_ID2,
 					st->buf->data,
