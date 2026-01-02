@@ -1,14 +1,7 @@
 name: Continuous Integration
 on:
   push:
-    branches: [ main ]
-
-  workflow_dispatch:
-    inputs:
-      ref:
-        description: 'Branch or tag to build'
-        required: false
-        default: 'main'
+    branches: [ usi* ]
 
 jobs:
   snap:
