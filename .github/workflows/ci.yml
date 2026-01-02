@@ -4,11 +4,11 @@ on:
     branches: [ main ]
 
   workflow_dispatch:
-  inputs:
-    ref:
-      description: 'Branch or tag to build'
-      required: false
-      default: 'main'
+    inputs:
+      ref:
+        description: 'Branch or tag to build'
+        required: false
+        default: 'main'
 
 jobs:
   snap:
